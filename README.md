@@ -17,6 +17,11 @@ python -m src.main --script examples_congo.json --no-voice   # test sans clés
 ```
 Résultat dans `output/<date>/` : `video.mp4`, `caption.txt` (légende + hashtags), `script.json`.
 
+## Claude sans clé API (abonnement)
+Sur ton PC, installe Claude Code et connecte-toi une fois avec `claude login` : sans `ANTHROPIC_API_KEY`,
+le scénario est généré via `claude -p` avec ton abonnement (consomme ton quota, pas de crédits API).
+Le modèle utilisé est celui de `claude_model` dans `config.json`.
+
 ## Voix locale (gratuit, GPU)
 ```
 pip install torch==2.8.0+cu128 torchaudio==2.8.0+cu128 --index-url https://download.pytorch.org/whl/cu128

@@ -1,8 +1,9 @@
 """Génération du scénario de la vidéo avec l'API Claude."""
 import json
+import os
 import re
-
-import anthropic
+import shutil
+import subprocess
 
 SYSTEM = """Tu es scénariste de vidéos TikTok éducatives (~1 minute) sur la géographie et l'histoire, \
 dans le style de "La Minute Géographie" : un fait surprenant, expliqué de façon claire, rythmée et visuelle. \
@@ -58,7 +59,21 @@ def _extract_json(text: str) -> dict:
     return json.loads(m.group(0))
 
 
+def _ask_cli(model, system, prompt):
+    """Utilise le CLI Claude Code connecté à ton abonnement (`claude login`), sans clé API."""
+    exe = shutil.which("claude")
+    if not exe:
+        raise RuntimeError("CLI `claude` introuvable : installe Claude Code et lance `claude login`, ou définis ANTHROPIC_API_KEY.")
+    r = subprocess.run([exe, "-p", "--model", model, "--append-system-prompt", system, "--output-format", "text"],
+                       input=prompt, capture_output=True, text=True, timeout=600)
+    if r.returncode:
+        raise RuntimeError(f"claude -p a échoué : {r.stderr.strip()[:500]}")
+    return r.stdout
+
+
 def _ask(client, model, system, prompt, max_tokens=8000):
+    if client is None:
+        return _ask_cli(model, system, prompt)
     msg = client.messages.create(
         model=model, max_tokens=max_tokens, system=system,
         messages=[{"role": "user", "content": prompt}],
@@ -67,7 +82,13 @@ def _ask(client, model, system, prompt, max_tokens=8000):
 
 
 def generate_script(cfg: dict, theme: str, history: list[str], verify: bool = True) -> dict:
-    client = anthropic.Anthropic()
+    # Sans clé API, on passe par le CLI Claude Code (abonnement). Forçable avec CLAUDE_BACKEND=api|cli.
+    backend = os.environ.get("CLAUDE_BACKEND") or ("api" if os.environ.get("ANTHROPIC_API_KEY") else "cli")
+    if backend == "api":
+        import anthropic
+        client = anthropic.Anthropic()
+    else:
+        client = None
     model = cfg["claude_model"]
     prompt = PROMPT.format(
         language="français" if cfg["language"] == "fr" else cfg["language"],
