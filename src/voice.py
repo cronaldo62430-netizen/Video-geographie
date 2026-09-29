@@ -41,14 +41,45 @@ def synthesize(text: str, dst_mp3: Path, cfg: dict) -> None:
     dst_mp3.write_bytes(r.content)
 
 
+class LocalTTS:
+    """Synthèse locale sur GPU avec OmniVoice (le moteur de VoiceStudio). Chargé une seule fois."""
+
+    def __init__(self, cfg: dict):
+        import torch  # noqa: F401
+        from omnivoice import OmniVoice
+
+        self.opts = cfg.get("omnivoice", {})
+        device = self.opts.get("device") or ("cuda:0" if torch.cuda.is_available() else "cpu")
+        print(f"Chargement d'OmniVoice sur {device}...")
+        self.model = OmniVoice.from_pretrained("k2-fsa/OmniVoice", device_map=device)
+
+    def synthesize(self, text: str, dst_wav: Path) -> None:
+        import soundfile as sf
+
+        kw = {"text": text}
+        if self.opts.get("ref_audio"):  # clonage d'une voix de référence (dont tu as les droits)
+            kw["ref_audio"] = self.opts["ref_audio"]
+            kw["ref_text"] = self.opts.get("ref_text", "")
+        elif self.opts.get("instruct"):  # sinon voix décrite, ex. "male, moderate pitch"
+            kw["instruct"] = self.opts["instruct"]
+        audio = self.model.generate(**kw)
+        sf.write(str(dst_wav), audio[0], 24000)
+
+
 def build_voice(scenes: list[dict], workdir: Path, cfg: dict, silent: bool) -> list[float]:
     """Génère l'audio de chaque scène ; renvoie les durées (s) et écrit workdir/voice.wav."""
     gap = 0.3
     wavs, durations = [], []
+    engine = os.environ.get("TTS_ENGINE") or cfg.get("tts_engine", "elevenlabs")
+    local = LocalTTS(cfg) if engine == "omnivoice" and not silent else None
     for i, sc in enumerate(scenes):
         wav = workdir / f"s{i:02d}.wav"
         if silent:
             silent_wav(wav, max(2.0, len(sc["narration"]) / 15) + gap)
+        elif local:
+            raw = workdir / f"s{i:02d}_raw.wav"
+            local.synthesize(sc["narration"], raw)
+            to_wav(raw, wav, pad=gap)
         else:
             mp3 = workdir / f"s{i:02d}.mp3"
             synthesize(sc["narration"], mp3, cfg)

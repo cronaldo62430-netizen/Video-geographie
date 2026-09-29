@@ -25,6 +25,7 @@ jobs:
           key: geodata-v1
       - name: Générer la vidéo
         env:
+          TTS_ENGINE: elevenlabs
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

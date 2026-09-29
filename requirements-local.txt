@@ -1,0 +1,4 @@
+# Voix locale (GPU NVIDIA) — installer d'abord PyTorch CUDA :
+#   pip install torch==2.8.0+cu128 torchaudio==2.8.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+omnivoice
+soundfile

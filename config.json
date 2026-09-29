@@ -9,5 +9,18 @@
   "width": 720,
   "height": 1280,
   "fps": 30,
-  "themes": ["géographie", "histoire", "géopolitique", "frontières et cartes", "records du monde"]
+  "themes": [
+    "géographie",
+    "histoire",
+    "géopolitique",
+    "frontières et cartes",
+    "records du monde"
+  ],
+  "tts_engine": "omnivoice",
+  "omnivoice": {
+    "device": "",
+    "instruct": "male, moderate pitch",
+    "ref_audio": "",
+    "ref_text": ""
+  }
 }
