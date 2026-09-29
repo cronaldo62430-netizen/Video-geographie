@@ -1,0 +1,45 @@
+name: Vidéo quotidienne
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # tous les jours à 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: geodata-v1
+      - name: Générer la vidéo
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python -m src.main
+      - name: Publier la vidéo en Release (téléchargeable depuis ton téléphone)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          d=$(ls -d output/*/ | tail -1)
+          tag="video-$(date +%Y-%m-%d-%H%M)"
+          gh release create "$tag" "$d/video.mp4" "$d/caption.txt" --title "$tag" --notes-file "$d/caption.txt"
+      - name: Sauvegarder l'historique des sujets
+        run: |
+          git config user.name "video-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add history.json
+          git commit -m "Historique des sujets" || exit 0
+          git push

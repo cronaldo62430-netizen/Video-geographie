@@ -1,0 +1,12 @@
+{
+  "topic": "Les deux Congo",
+  "title": "Pourquoi y a-t-il deux Congo ?",
+  "caption": "Deux pays, un même nom, 46 jours d'écart. Tu le savais ?",
+  "hashtags": ["#geographie", "#histoire", "#congo", "#afrique"],
+  "scenes": [
+    {"narration": "Et voici... le Congo.", "text": "Congo", "visual": {"type": "map", "zoom": ["COD", "COG"], "highlight": [{"country": "COD", "color": "blue"}], "labels": [{"country": "COD", "text": "Congo"}]}},
+    {"narration": "Mais y a-t-il deux Congo ?", "text": "???", "visual": {"type": "map", "zoom": ["COD", "COG"], "highlight": [{"country": "COD", "color": "red"}, {"country": "COG", "color": "green"}]}},
+    {"narration": "À la fin du XIXe siècle, les puissances européennes se partagent l'Afrique.", "text": "Fin du XIXe siècle", "visual": {"type": "map", "zoom": [], "bbox": [-20, -38, 55, 38], "highlight": [{"country": "COD", "color": "purple"}]}},
+    {"narration": "Rive sud, le roi Léopold II. Rive nord, la France.", "visual": {"type": "map", "zoom": ["COD", "COG"], "highlight": [{"country": "COD", "color": "purple"}, {"country": "COG", "color": "green"}], "markers": [{"lon": 15.3, "lat": -4.3, "text": "Kinshasa"}, {"lon": 15.28, "lat": -4.26, "text": ""}]}}
+  ]
+}

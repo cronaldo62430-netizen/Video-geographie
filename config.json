@@ -1,0 +1,13 @@
+{
+  "channel_handle": "@ta_chaine",
+  "language": "fr",
+  "target_words": 150,
+  "claude_model": "claude-sonnet-5-5",
+  "elevenlabs_voice_id": "pNInz6obpgDQGcFmaJgB",
+  "elevenlabs_model": "eleven_multilingual_v2",
+  "image_model": "gpt-image-1",
+  "width": 720,
+  "height": 1280,
+  "fps": 30,
+  "themes": ["géographie", "histoire", "géopolitique", "frontières et cartes", "records du monde"]
+}
